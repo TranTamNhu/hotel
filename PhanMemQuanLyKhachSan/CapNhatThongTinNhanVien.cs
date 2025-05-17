@@ -58,7 +58,8 @@ namespace PhanMemQuanLyKhachSan
         private NhanVien GetNhanVien()
         {
             NhanVien k = new NhanVien();
-            k.TenNV = txtTimKiemTTNV.Text;
+            k.TenNV = txtTimKiemTTNV.Text.Trim();
+            k.PathImage = "user.png"; // Ảnh mặc định
             return k;
         }
         private void frmCapNhatThongTinNhanVien_Load(object sender, EventArgs e)
@@ -81,13 +82,15 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                NhanVien s = GetNhanVien();
-                NhanVien db = NhanVien.GetNhanVien(s.NhanVienID);
-                if (db == null)
+                if (string.IsNullOrWhiteSpace(txtTimKiemTTNV.Text))
                 {
-                    s.InsertUpdate();
-                    MessageBox.Show("Thêm nhân viên thành công!");
+                    MessageBox.Show("Vui lòng nhập tên nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
+
+                NhanVien s = GetNhanVien();
+                s.InsertUpdate();
+                MessageBox.Show("Thêm nhân viên thành công!");
                 BindGrid(NhanVien.GetAll());
             }
             catch (Exception ex)

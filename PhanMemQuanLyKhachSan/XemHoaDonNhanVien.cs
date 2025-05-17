@@ -60,9 +60,21 @@ namespace PhanMemQuanLyKhachSan
                         h.NgayHD,
                         h.TongTien,
                         TenKhachHang = h.KhachHang.TenKH,
-                        TenPhong = h.Phong != null && h.Phong.LoaiPhong != null 
-                            ? $"Phòng {h.PhongID} - {h.Phong.LoaiPhong.TenLoai}" 
-                            : $"Phòng {h.PhongID}",
+                        PhongID = h.PhongID,
+                        TenLoaiPhong = h.Phong.LoaiPhong.TenLoai,
+                        h.SoKhach,
+                        h.SoDem
+                    })
+                    .ToList()
+                    .Select(h => new
+                    {
+                        h.HoaDonID,
+                        h.NgayHD,
+                        h.TongTien,
+                        h.TenKhachHang,
+                        TenPhong = string.IsNullOrEmpty(h.TenLoaiPhong) 
+                            ? $"Phòng {h.PhongID}" 
+                            : $"Phòng {h.PhongID} - {h.TenLoaiPhong}",
                         h.SoKhach,
                         h.SoDem
                     })

@@ -46,6 +46,24 @@ namespace PhanMemQuanLyKhachSan
                 dgvQuanLyPhong.Rows[index].Cells[0].Value = item.PhongID;
                 dgvQuanLyPhong.Rows[index].Cells[1].Value = item.LoaiPhong.TenLoai;
                 dgvQuanLyPhong.Rows[index].Cells[2].Value = item.GiaPhong;
+                dgvQuanLyPhong.Rows[index].Cells[3].Value = item.TrangThai;
+
+                // Đặt màu cho từng trạng thái
+                switch (item.TrangThai)
+                {
+                    case Phong.TrangThaiPhong.Trong:
+                        dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightGreen;
+                        break;
+                    case Phong.TrangThaiPhong.DangO:
+                        dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightPink;
+                        break;
+                    case Phong.TrangThaiPhong.DaDat:
+                        dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightYellow;
+                        break;
+                    case Phong.TrangThaiPhong.BaoTri:
+                        dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightGray;
+                        break;
+                }
             }
         }
         private void ButtonCapNhapLoaiPhong_Click(object sender, EventArgs e)
@@ -88,9 +106,46 @@ namespace PhanMemQuanLyKhachSan
             this.Hide();
         }
 
-        private void dgvQuanLyPhong_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvQuanLyPhong_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex >= 0)
+            {
+                var row = dgvQuanLyPhong.Rows[e.RowIndex];
+                var trangThai = row.Cells[3].Value?.ToString().Trim();
+                var phongId = Convert.ToInt32(row.Cells[0].Value);
 
+                // Chỉ cho phép đặt phòng khi trạng thái là "Trống"
+                if (trangThai != Phong.TrangThaiPhong.Trong)
+                {
+                    string message = "";
+                    switch (trangThai)
+                    {
+                        case var t when t == Phong.TrangThaiPhong.DangO:
+                            message = "Phòng đang có khách ở, không thể đặt phòng!";
+                            break;
+                        case var t when t == Phong.TrangThaiPhong.DaDat:
+                            message = "Phòng đã được đặt trước!";
+                            break;
+                        case var t when t == Phong.TrangThaiPhong.BaoTri:
+                            message = "Phòng đang bảo trì!";
+                            break;
+                        default:
+                            message = "Không thể đặt phòng này!";
+                            break;
+                    }
+                    MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Nếu phòng trống thì mở form đặt phòng
+                var ctpp = new frmChiTietPhieuPhong(phongId);
+                ctpp.FormClosed += (s, args) => {
+                    this.Show();
+                    BindGrid(Phong.GetAll()); // Refresh lại danh sách phòng
+                };
+                ctpp.Show();
+                this.Hide();
+            }
         }
 
         private void frmQuanLyPhong_Load(object sender, EventArgs e)
@@ -98,11 +153,35 @@ namespace PhanMemQuanLyKhachSan
             try
             {
                 SetGridViewStyle(dgvQuanLyPhong);
+                KhoiTaoTrangThaiPhong();
                 BindGrid(Phong.GetAll());
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void KhoiTaoTrangThaiPhong()
+        {
+            try
+            {
+                var context = new QLKSModel();
+                var phongsChuaCoTrangThai = context.Phongs.Where(p => p.TrangThai == null || p.TrangThai == "").ToList();
+                
+                foreach (var phong in phongsChuaCoTrangThai)
+                {
+                    phong.TrangThai = Phong.TrangThaiPhong.Trong;
+                }
+                
+                if (phongsChuaCoTrangThai.Any())
+                {
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi khởi tạo trạng thái phòng: " + ex.Message);
             }
         }
 

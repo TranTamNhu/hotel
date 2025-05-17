@@ -10,16 +10,25 @@ namespace PhanMemQuanLyKhachSan
     public partial class frmChiTietPhieuPhong : Form
     {
         public frmManHinhChinh objManHinhChinh;
+        private int selectedPhongId;
+
         public frmChiTietPhieuPhong()
         {
             InitializeComponent();
         }
+
+        public frmChiTietPhieuPhong(int phongId)
+        {
+            InitializeComponent();
+            selectedPhongId = phongId;
+        }
+
         public frmChiTietPhieuPhong(frmManHinhChinh frm)
         {
-
             InitializeComponent();
             objManHinhChinh = frm;
         }
+
         public void SetGridViewStyle(DataGridView dgview)
         {
             dgview.BorderStyle = BorderStyle.None;
@@ -95,22 +104,35 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-
                 //insert khách hàng trước mới có hóa đơn
                 KhachHang kh = new KhachHang();
                 kh.TenKH = txtChiTietTenKhach.Text;
                 kh.QuocTich = txtChiTietQuocTich.Text;
                 kh = kh.InsertUpdate();
-               List<DichVu> listDV = GetListDichVu();
+                List<DichVu> listDV = GetListDichVu();
 
                 //insert hoa don
                 HoaDon hd = GetHoaDon();
 
                 //insert  khách hàng trước khi insert hóa đơn
                 hd.KhachHangID = kh.KhachHangID;
-                hd.TongTien = listDV.Sum(p => p.ThanhTien) + int.Parse(txtChiTietGiaPhong.Text) * hd.SoDem.Value;
+
+                // Tính tổng tiền an toàn với kiểu nullable
+                int giaPhong = 0;
+                if (int.TryParse(txtChiTietGiaPhong.Text, out int giaPhongTemp))
+                    giaPhong = giaPhongTemp;
+
+                hd.TongTien = listDV.Sum(p => p.ThanhTien) + (giaPhong * (hd.SoDem ?? 0));
 
                 int hoaDonID = hd.InsertUpdate();
+
+                // Cập nhật trạng thái phòng thành "Đang ở"
+                var phong = Phong.GetPhong(hd.PhongID ?? 0);
+                if (phong != null)
+                {
+                    phong.TrangThai = Phong.TrangThaiPhong.DangO;
+                    phong.InsertUpdate();
+                }
 
                 //có hóa đơn rồi insert chi tiet hoa don
                 foreach(DichVu d in listDV)
@@ -119,17 +141,13 @@ namespace PhanMemQuanLyKhachSan
                     item.DichVuID = d.DichVuID;
                     item.GiaDV = d.GiaDV;
                     item.HoaDonID = hoaDonID;
-
                     item.SoLuong = d.SoLuong;
                     item.ThanhTien = d.ThanhTien;
-             
                     item.InsertUpdate();                  
                 }
-                //   GetDichVu();
+
                 objManHinhChinh.SetBookingRoom();
                 this.Close();
-              //  frmManHinhChinh frm2 = new frmManHinhChinh();
-              //  frm2.Show();
             }
             catch (Exception ex)
             {
@@ -144,42 +162,90 @@ namespace PhanMemQuanLyKhachSan
 
         private void frmChiTietPhieuPhong_Load(object sender, EventArgs e)
         {
-            SetGridViewStyle(dgvChiTietDichVu);
-            FillDichVuCombobox(DichVu.GetAll());
-            FillLoaiPhongCombobox(LoaiPhong.GetAll());
-            cmbLoaiPhong.SelectedIndex = 0;
-            //FillSoPhongCombobox(Phong.GetAll().);
-            FillTenBookingCombobox(Booking.GetAll());
-            FillComboboxNhanVien(cmbNhanVien, NhanVien.GetAll());
-            cmbSoPhong.SelectedIndex = 0;
-            cmbNhanVien.SelectedIndex = 0;          
+            try
+            {
+                SetGridViewStyle(dgvChiTietDichVu);
+                FillDichVuCombobox(DichVu.GetAll());
+                FillLoaiPhongCombobox(LoaiPhong.GetAll());
+                FillTenBookingCombobox(Booking.GetAll());
+                FillComboboxNhanVien(cmbNhanVien, NhanVien.GetAll());
+
+                if (selectedPhongId > 0)
+                {
+                    var phong = Phong.GetPhong(selectedPhongId);
+                    if (phong != null)
+                    {
+                        // Chọn loại phòng
+                        cmbLoaiPhong.SelectedValue = phong.LoaiPhongID;
+                        
+                        // Chọn số phòng
+                        cmbSoPhong.Text = phong.PhongID.ToString();
+                        
+                        // Hiển thị giá phòng
+                        txtChiTietGiaPhong.Text = phong.GiaPhong.ToString();
+                    }
+                }
+                else
+                {
+                    cmbLoaiPhong.SelectedIndex = 0;
+                    cmbSoPhong.SelectedIndex = 0;
+                }
+                
+                cmbNhanVien.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải thông tin phòng: " + ex.Message);
+            }
         }
 
         private HoaDon GetHoaDon()
         {
             HoaDon hd = new HoaDon();
             hd.TenLoai = cmbLoaiPhong.Text;
-            hd.NhanVienID = int.Parse(cmbNhanVien.SelectedValue + "");
-            hd.PhongID = int.Parse(cmbSoPhong.SelectedValue + "");
-            hd.SoDem = int.Parse(txtChiTietSoDem.Text);
-            hd.SoKhach = int.Parse(txtChiTietSoKhach.Text);
+
+            // Chuyển đổi an toàn từ string sang int?
+            if (int.TryParse(cmbNhanVien.SelectedValue?.ToString(), out int nhanVienId))
+                hd.NhanVienID = nhanVienId;
+
+            if (int.TryParse(cmbSoPhong.SelectedValue?.ToString(), out int phongId))
+                hd.PhongID = phongId;
+
+            if (int.TryParse(txtChiTietSoDem.Text, out int soDem))
+                hd.SoDem = soDem;
+
+            if (int.TryParse(txtChiTietSoKhach.Text, out int soKhach))
+                hd.SoKhach = soKhach;
+
             hd.NgayHD = dtpNgayDi.Value.ToString("dd/MM/yyyy");
 
-            if(cmbTenBooking.Text != "")
-              hd.BookingID = int.Parse(cmbTenBooking.SelectedValue + "");
+            if (!string.IsNullOrEmpty(cmbTenBooking.Text) && 
+                int.TryParse(cmbTenBooking.SelectedValue?.ToString(), out int bookingId))
+            {
+                hd.BookingID = bookingId;
+            }
+
             return hd;
         }
         private List<DichVu> GetListDichVu()  //lay nguoc tu datagrid ra
         {
-            //giá trị có thể là null nên cộng với null để k bị lỗi
             List<DichVu> list = new List<DichVu>();
             foreach (DataGridViewRow row in this.dgvChiTietDichVu.Rows)
             {
                 DichVu dv = new DichVu();
-                dv.DichVuID = int.Parse(row.Cells["id"].Value + "");
-                dv.GiaDV = int.Parse(row.Cells[2].Value + "");
-                dv.SoLuong = int.Parse(row.Cells[3].Value + "");
-                dv.ThanhTien = int.Parse(row.Cells[4].Value + "");
+                
+                if (int.TryParse(row.Cells["id"].Value?.ToString(), out int dichVuId))
+                    dv.DichVuID = dichVuId;
+
+                if (int.TryParse(row.Cells[2].Value?.ToString(), out int giaDv))
+                    dv.GiaDV = giaDv;
+
+                if (int.TryParse(row.Cells[3].Value?.ToString(), out int soLuong))
+                    dv.SoLuong = soLuong;
+
+                if (int.TryParse(row.Cells[4].Value?.ToString(), out int thanhTien))
+                    dv.ThanhTien = thanhTien;
+
                 list.Add(dv);
             }
 

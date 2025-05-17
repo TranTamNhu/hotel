@@ -36,6 +36,7 @@
             this.stt = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TenLoaiPhong = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Gia = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TrangThai = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnTroVeCuaCTPP = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuanLyPhong)).BeginInit();
@@ -100,7 +101,8 @@
             this.dgvQuanLyPhong.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.stt,
             this.TenLoaiPhong,
-            this.Gia});
+            this.Gia,
+            this.TrangThai});
             this.dgvQuanLyPhong.Location = new System.Drawing.Point(248, 159);
             this.dgvQuanLyPhong.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dgvQuanLyPhong.Name = "dgvQuanLyPhong";
@@ -108,7 +110,7 @@
             this.dgvQuanLyPhong.RowHeadersWidth = 62;
             this.dgvQuanLyPhong.Size = new System.Drawing.Size(810, 416);
             this.dgvQuanLyPhong.TabIndex = 4;
-            this.dgvQuanLyPhong.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvQuanLyPhong_CellContentClick);
+            this.dgvQuanLyPhong.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvQuanLyPhong_CellClick);
             // 
             // stt
             // 
@@ -133,6 +135,14 @@
             this.Gia.MinimumWidth = 8;
             this.Gia.Name = "Gia";
             this.Gia.ReadOnly = true;
+            // 
+            // TrangThai
+            // 
+            this.TrangThai.FillWeight = 130.9645F;
+            this.TrangThai.HeaderText = "Trạng Thái";
+            this.TrangThai.MinimumWidth = 8;
+            this.TrangThai.Name = "TrangThai";
+            this.TrangThai.ReadOnly = true;
             // 
             // btnTroVeCuaCTPP
             // 
@@ -199,6 +209,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn stt;
         private System.Windows.Forms.DataGridViewTextBoxColumn TenLoaiPhong;
         private System.Windows.Forms.DataGridViewTextBoxColumn Gia;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TrangThai;
         private System.Windows.Forms.Label label1;
     }
 }
