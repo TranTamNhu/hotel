@@ -189,7 +189,7 @@
             this.lblKhachSan.Name = "lblKhachSan";
             this.lblKhachSan.Size = new System.Drawing.Size(1292, 60);
             this.lblKhachSan.TabIndex = 0;
-            this.lblKhachSan.Text = "Khách Sạn Sài Gòn Odyssey Hotel";
+            this.lblKhachSan.Text = "Khách Sạn  TTN Hotel";
             this.lblKhachSan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblKhachSan.Click += new System.EventHandler(this.LblKhachSan_Click);
             // 
@@ -1764,7 +1764,7 @@
             this.Controls.Add(this.pnlPhong1);
             this.Controls.Add(this.lblKhachSan);
             this.Controls.Add(this.msManhinhchinh);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmManHinhChinh";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Màn Hình Chính";

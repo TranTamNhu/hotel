@@ -41,11 +41,12 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Palatino Linotype", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(160, 9);
+            this.label1.Location = new System.Drawing.Point(213, 11);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(460, 50);
+            this.label1.Size = new System.Drawing.Size(582, 63);
             this.label1.TabIndex = 0;
-            this.label1.Text = "DOANH THU NĂM 2019";
+            this.label1.Text = "DOANH THU NĂM 2025";
             this.label1.Click += new System.EventHandler(this.Label1_Click);
             // 
             // chart1
@@ -58,14 +59,15 @@
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(12, 98);
+            this.chart1.Location = new System.Drawing.Point(16, 121);
+            this.chart1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.chart1.Name = "chart1";
             this.chart1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Pastel;
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Tổng Tiền";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(776, 431);
+            this.chart1.Size = new System.Drawing.Size(1035, 530);
             this.chart1.TabIndex = 1;
             this.chart1.Text = "Doanh Thu Khách Sạn 2019";
             // 
@@ -74,9 +76,10 @@
             this.btnTroVeCuaThongKe.Font = new System.Drawing.Font("Palatino Linotype", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTroVeCuaThongKe.Image = global::PhanMemQuanLyKhachSan.Properties.Resources.iconBack;
             this.btnTroVeCuaThongKe.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnTroVeCuaThongKe.Location = new System.Drawing.Point(12, 11);
+            this.btnTroVeCuaThongKe.Location = new System.Drawing.Point(16, 14);
+            this.btnTroVeCuaThongKe.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnTroVeCuaThongKe.Name = "btnTroVeCuaThongKe";
-            this.btnTroVeCuaThongKe.Size = new System.Drawing.Size(101, 37);
+            this.btnTroVeCuaThongKe.Size = new System.Drawing.Size(135, 46);
             this.btnTroVeCuaThongKe.TabIndex = 10;
             this.btnTroVeCuaThongKe.Text = "Trở về";
             this.btnTroVeCuaThongKe.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -85,12 +88,13 @@
             // 
             // frmThongKe
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 541);
+            this.ClientSize = new System.Drawing.Size(1067, 666);
             this.Controls.Add(this.btnTroVeCuaThongKe);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.label1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "frmThongKe";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Thống Kê";

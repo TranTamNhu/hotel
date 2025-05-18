@@ -82,8 +82,10 @@
     <Compile Include="CapNhatVatTu.Designer.cs">
       <DependentUpon>CapNhatVatTu.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controller\DichVuController.cs" />
     <Compile Include="Controller\LichLamViecController.cs" />
     <Compile Include="Controller\LoaiPhongController.cs" />
+    <Compile Include="Controller\NhanVienController.cs" />
     <Compile Include="DangNhap.cs">
       <SubType>Form</SubType>
     </Compile>

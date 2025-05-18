@@ -70,7 +70,7 @@ namespace PhanMemQuanLyKhachSan
 
         private VatTu GetVatTu()
         {
-            VatTu k = new VatTu();          
+            VatTu k = new VatTu();
             k.TenVT = txtCapNhatVatTu.Text;
             return k;
         }
@@ -79,18 +79,24 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                VatTu s = GetVatTu();
-                VatTu db = VatTu.GetVatTu(s.VatTuID);
-                if (db == null)
+                // Kiểm tra dữ liệu đầu vào
+                if (string.IsNullOrWhiteSpace(txtCapNhatVatTu.Text))
                 {
-                    s.InsertUpdate();
-                    MessageBox.Show("Thêm vật tư thành công!");
+                    MessageBox.Show("Vui lòng nhập tên vật tư!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCapNhatVatTu.Focus();
+                    return;
                 }
+
+                VatTu s = GetVatTu();
+                s.InsertUpdate();
+                MessageBox.Show("Thêm vật tư thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                txtCapNhatVatTu.Clear();
+                txtCapNhatVatTu.Focus();
                 BindGrid(VatTu.GetAll());
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -98,13 +104,33 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                int rowIndex = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
-                VatTu.Delete(rowIndex);
-                BindGrid(VatTu.GetAll());
+                // Kiểm tra đã chọn dòng cần xóa chưa
+                if (dgvCapNhatVatTu.CurrentRow == null)
+                {
+                    MessageBox.Show("Vui lòng chọn vật tư cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Hiển thị hộp thoại xác nhận
+                string tenVT = dgvCapNhatVatTu.CurrentRow.Cells[2].Value.ToString();
+                DialogResult result = MessageBox.Show(
+                    $"Bạn có chắc chắn muốn xóa vật tư '{tenVT}' không?",
+                    "Xác nhận xóa",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    int rowIndex = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
+                    VatTu.Delete(rowIndex);
+                    MessageBox.Show("Xóa vật tư thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    BindGrid(VatTu.GetAll());
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -118,19 +144,42 @@ namespace PhanMemQuanLyKhachSan
                 txtCapNhatVatTu.Text = db.TenVT.ToString();
             }
         }
-        
+
         private void btnLuuCapNhatVatTu_Click(object sender, EventArgs e)
         {
-            VatTu s = GetVatTu();
-            s.VatTuID = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
-            VatTu db = VatTu.GetVatTu(s.VatTuID);
-            if (db != null)
+            try
             {
-                db = s;
-                db.InsertUpdate();
-                MessageBox.Show("Sửa thành công!");
+                // Kiểm tra đã chọn dòng cần sửa chưa
+                if (dgvCapNhatVatTu.CurrentRow == null)
+                {
+                    MessageBox.Show("Vui lòng chọn vật tư cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Kiểm tra dữ liệu đầu vào
+                if (string.IsNullOrWhiteSpace(txtCapNhatVatTu.Text))
+                {
+                    MessageBox.Show("Vui lòng nhập tên vật tư!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCapNhatVatTu.Focus();
+                    return;
+                }
+
+                int vatTuId = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
+                VatTu db = VatTu.GetVatTu(vatTuId);
+                if (db != null)
+                {
+                    db.TenVT = txtCapNhatVatTu.Text.Trim();
+                    db.InsertUpdate();
+                    MessageBox.Show("Cập nhật vật tư thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    txtCapNhatVatTu.Clear();
+                    txtCapNhatVatTu.Focus();
+                    BindGrid(VatTu.GetAll());
+                }
             }
-            BindGrid(VatTu.GetAll());
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void lblVatTuKhachSan_Click(object sender, EventArgs e)
