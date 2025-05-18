@@ -92,9 +92,13 @@
     <Compile Include="DangNhap.Designer.cs">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202505161635461_InitialCreate.cs" />
-    <Compile Include="Migrations\202505161635461_InitialCreate.Designer.cs">
-      <DependentUpon>202505161635461_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\202505180123001_InitialCreate.cs" />
+    <Compile Include="Migrations\202505180123001_InitialCreate.Designer.cs">
+      <DependentUpon>202505180123001_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505180124453_AddTrangThaiToPhong.cs" />
+    <Compile Include="Migrations\202505180124453_AddTrangThaiToPhong.Designer.cs">
+      <DependentUpon>202505180124453_AddTrangThaiToPhong.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\ChiTietHoaDon.cs" />
@@ -185,8 +189,11 @@
     <EmbeddedResource Include="DangNhap.resx">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202505161635461_InitialCreate.resx">
-      <DependentUpon>202505161635461_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202505180123001_InitialCreate.resx">
+      <DependentUpon>202505180123001_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505180124453_AddTrangThaiToPhong.resx">
+      <DependentUpon>202505180124453_AddTrangThaiToPhong.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ThongKe.resx">
       <DependentUpon>ThongKe.cs</DependentUpon>

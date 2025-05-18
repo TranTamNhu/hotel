@@ -43,7 +43,7 @@ namespace PhanMemQuanLyKhachSan
             dgview.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void BindGrid(List<LichLamViec> listVatTu)
+        private void BindGrid(List<LichLamViec> listVatTu) /// hiển thị lên bảng
         {
             dgvCapNhatLichLamViec.Rows.Clear();
             int id = 1;

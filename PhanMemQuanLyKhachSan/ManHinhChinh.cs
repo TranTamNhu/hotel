@@ -18,36 +18,36 @@ namespace PhanMemQuanLyKhachSan
         {
             InitializeComponent();
         }
-          
+
         public void SetBookingRoom()
         {
             var listHD = HoaDon.GetAll();
             var listPhong = Phong.GetAll();
 
             // Cập nhật trạng thái cho tất cả các phòng
-            void UpdateRoomStatus(int phongId, Panel pnlPhong, Label lblNoiDungTenBooking, 
+            void UpdateRoomStatus(int phongId, Panel pnlPhong, Label lblNoiDungTenBooking,
                 Label lblNoiDungTenKhach, Label lblNoiDungSoKhach, Label lblNoiDungQuocTich,
                 Label lblNoiDungNgayDen, Label lblNoiDungNgayDi)
             {
                 var phong = listPhong.FirstOrDefault(p => p.PhongID == phongId);
-                var hoaDon = listHD.LastOrDefault(p => p.PhongID != null && p.PhongID == phongId);
+                var hoaDon = listHD.LastOrDefault(p => p.PhongID != null && p.PhongID == phongId);// tìm hoá đơn mới nhất của phòng đó
 
                 // Cập nhật màu nền dựa trên trạng thái
                 if (phong != null)
                 {
                     switch (phong.TrangThai)
                     {
-                        case Phong.TrangThaiPhong.DangO:
-                            pnlPhong.BackColor = Color.LightPink; // Đang có khách
+                        case "Đang ở":
+                            pnlPhong.BackColor = Color.LightPink; 
                             break;
-                        case Phong.TrangThaiPhong.DaDat:
-                            pnlPhong.BackColor = Color.LightYellow; // Đã đặt trước
+                        case "Đã đặt":
+                            pnlPhong.BackColor = Color.LightYellow; 
                             break;
-                        case Phong.TrangThaiPhong.BaoTri:
-                            pnlPhong.BackColor = Color.LightGray; // Đang bảo trì
+                        case "Bảo trì":
+                            pnlPhong.BackColor = Color.LightGray; 
                             break;
                         default:
-                            pnlPhong.BackColor = Color.LightGreen; // Trống
+                            pnlPhong.BackColor = Color.LightGreen;
                             break;
                     }
                 }
@@ -76,7 +76,7 @@ namespace PhanMemQuanLyKhachSan
             }
 
             // Cập nhật cho từng phòng
-            UpdateRoomStatus(1, pnlPhong1, lblNoiDungTenBooking1, lblNoiDungTenKhach1, 
+            UpdateRoomStatus(1, pnlPhong1, lblNoiDungTenBooking1, lblNoiDungTenKhach1,
                 lblNoiDungSoKhach1, lblNoiDungQuocTich1, lblNoiDungNgayDen1, lblNoiDungNgayDi1);
 
             UpdateRoomStatus(2, pnlPhong2, lblNoiDungTenBooking2, lblNoiDungTenKhach2,
@@ -103,18 +103,22 @@ namespace PhanMemQuanLyKhachSan
 
         private void btnChitiet1_Click(object sender, EventArgs e)
         {
-            // Lấy phòng từ database
-            var phong = Phong.GetPhong(1); // 1 là ID của phòng 1
-            
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            var phong = Phong.GetPhong(1);
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 1);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
         private void fmmhctpp_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -148,10 +152,10 @@ namespace PhanMemQuanLyKhachSan
         {
             frmThongKe frmThongKe = new frmThongKe();
             frmThongKe.Show();
-         
+
         }
 
-       
+
 
         private void cậpNhậtVậtTưToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -225,10 +229,10 @@ namespace PhanMemQuanLyKhachSan
         {
             // Lấy phòng từ database
             var phong = Phong.GetPhong(1);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null && phong.TrangThai == "Đang ở")
             {
                 // Cập nhật trạng thái phòng thành Trống
-                phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
+                phong.CapNhatTrangThai("Trống");
 
                 // Xóa thông tin hiển thị
                 lblNoiDungTenBooking1.Text = ".........................................";
@@ -414,18 +418,18 @@ namespace PhanMemQuanLyKhachSan
             }
         }
 
-      
-       
-
-       
-       
-
-       
 
 
-        
 
-       
+
+
+
+
+
+
+
+
+
         private void lblSoKhach3_Click(object sender, EventArgs e)
         {
 
@@ -439,99 +443,141 @@ namespace PhanMemQuanLyKhachSan
         private void btnChitiet2_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(2);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 2);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet3_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(3);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 3);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet4_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(4);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 4);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet5_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(5);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 5);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet6_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(6);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 6);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet7_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(7);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 7);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
 
         private void btnChitiet8_Click(object sender, EventArgs e)
         {
             var phong = Phong.GetPhong(8);
-            if (phong != null && phong.TrangThai == Phong.TrangThaiPhong.DangO)
+            if (phong != null)
             {
-                MessageBox.Show("Phòng đang có khách ở, không thể đặt phòng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (phong.TrangThai == "Trống")
+                {
+                    // Nếu phòng trống thì cho phép đặt phòng
+                    frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this, 8);
+                    fmmhctpp.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-
-            frmChiTietPhieuPhong fmmhctpp = new frmChiTietPhieuPhong(this);
-            fmmhctpp.Show();
-            this.Hide();
         }
     }
 }

@@ -51,16 +51,16 @@ namespace PhanMemQuanLyKhachSan
                 // Đặt màu cho từng trạng thái
                 switch (item.TrangThai)
                 {
-                    case Phong.TrangThaiPhong.Trong:
+                    case "Trống":
                         dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightGreen;
                         break;
-                    case Phong.TrangThaiPhong.DangO:
+                    case "Đang ở":
                         dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightPink;
                         break;
-                    case Phong.TrangThaiPhong.DaDat:
+                    case "Đã đặt":
                         dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightYellow;
                         break;
-                    case Phong.TrangThaiPhong.BaoTri:
+                    case "Bảo trì":
                         dgvQuanLyPhong.Rows[index].DefaultCellStyle.BackColor = Color.LightGray;
                         break;
                 }
@@ -111,40 +111,39 @@ namespace PhanMemQuanLyKhachSan
             if (e.RowIndex >= 0)
             {
                 var row = dgvQuanLyPhong.Rows[e.RowIndex];
-                var trangThai = row.Cells[3].Value?.ToString().Trim();
-                var phongId = Convert.ToInt32(row.Cells[0].Value);
-
-                // Chỉ cho phép đặt phòng khi trạng thái là "Trống"
-                if (trangThai != Phong.TrangThaiPhong.Trong)
+                var phongId = int.Parse(row.Cells[0].Value.ToString());
+                var phong = Phong.GetPhong(phongId);
+                
+                if (phong != null)
                 {
-                    string message = "";
-                    switch (trangThai)
+                    if (phong.TrangThai == "Trống")
                     {
-                        case var t when t == Phong.TrangThaiPhong.DangO:
-                            message = "Phòng đang có khách ở, không thể đặt phòng!";
-                            break;
-                        case var t when t == Phong.TrangThaiPhong.DaDat:
-                            message = "Phòng đã được đặt trước!";
-                            break;
-                        case var t when t == Phong.TrangThaiPhong.BaoTri:
-                            message = "Phòng đang bảo trì!";
-                            break;
-                        default:
-                            message = "Không thể đặt phòng này!";
-                            break;
+                        // Nếu phòng trống thì cho phép đặt phòng
+                        var mainForm = Application.OpenForms.OfType<frmManHinhChinh>().FirstOrDefault();
+                        frmChiTietPhieuPhong ctpp;
+                        
+                        if (mainForm != null)
+                        {
+                            ctpp = new frmChiTietPhieuPhong(mainForm, phongId);
+                        }
+                        else
+                        {
+                            ctpp = new frmChiTietPhieuPhong(phongId);
+                        }
+                        
+                        ctpp.FormClosed += (s, args) => {
+                            this.Show();
+                            BindGrid(Phong.GetAll()); // Refresh lại danh sách phòng
+                        };
+                        ctpp.Show();
+                        this.Hide();
                     }
-                    MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
+                    else
+                    {
+                        MessageBox.Show($"Phòng đang trong trạng thái {phong.TrangThai}, không thể đặt phòng!", 
+                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
-
-                // Nếu phòng trống thì mở form đặt phòng
-                var ctpp = new frmChiTietPhieuPhong(phongId);
-                ctpp.FormClosed += (s, args) => {
-                    this.Show();
-                    BindGrid(Phong.GetAll()); // Refresh lại danh sách phòng
-                };
-                ctpp.Show();
-                this.Hide();
             }
         }
 
@@ -171,7 +170,7 @@ namespace PhanMemQuanLyKhachSan
                 
                 foreach (var phong in phongsChuaCoTrangThai)
                 {
-                    phong.TrangThai = Phong.TrangThaiPhong.Trong;
+                    phong.TrangThai = "Trống";
                 }
                 
                 if (phongsChuaCoTrangThai.Any())

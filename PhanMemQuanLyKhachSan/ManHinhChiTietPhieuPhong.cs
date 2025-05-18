@@ -10,7 +10,7 @@ namespace PhanMemQuanLyKhachSan
     public partial class frmChiTietPhieuPhong : Form
     {
         public frmManHinhChinh objManHinhChinh;
-        private int selectedPhongId;
+        public int selectedPhongId;
 
         public frmChiTietPhieuPhong()
         {
@@ -27,6 +27,13 @@ namespace PhanMemQuanLyKhachSan
         {
             InitializeComponent();
             objManHinhChinh = frm;
+        }
+
+        public frmChiTietPhieuPhong(frmManHinhChinh frm, int phongId)
+        {
+            InitializeComponent();
+            objManHinhChinh = frm;
+            selectedPhongId = phongId;
         }
 
         public void SetGridViewStyle(DataGridView dgview)
@@ -117,12 +124,15 @@ namespace PhanMemQuanLyKhachSan
                 //insert  khách hàng trước khi insert hóa đơn
                 hd.KhachHangID = kh.KhachHangID;
 
-                // Tính tổng tiền an toàn với kiểu nullable
-                int giaPhong = 0;
-                if (int.TryParse(txtChiTietGiaPhong.Text, out int giaPhongTemp))
-                    giaPhong = giaPhongTemp;
-
-                hd.TongTien = listDV.Sum(p => p.ThanhTien) + (giaPhong * (hd.SoDem ?? 0));
+                // Tính tổng tiền từ giá trị đã được tính
+                if (int.TryParse(lblChiTietTongTien.Text.Replace(",", ""), out int tongTien))
+                {
+                    hd.TongTien = tongTien;
+                }
+                else
+                {
+                    hd.TongTien = 0;
+                }
 
                 int hoaDonID = hd.InsertUpdate();
 
@@ -130,7 +140,7 @@ namespace PhanMemQuanLyKhachSan
                 var phong = Phong.GetPhong(hd.PhongID ?? 0);
                 if (phong != null)
                 {
-                    phong.TrangThai = Phong.TrangThaiPhong.DangO;
+                    phong.TrangThai = "Đang ở";
                     phong.InsertUpdate();
                 }
 
@@ -146,12 +156,19 @@ namespace PhanMemQuanLyKhachSan
                     item.InsertUpdate();                  
                 }
 
-                objManHinhChinh.SetBookingRoom();
+                MessageBox.Show("Lưu thông tin thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                if (objManHinhChinh != null)
+                {
+                    objManHinhChinh.SetBookingRoom();
+                    objManHinhChinh.Show();
+                }
+                
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Lỗi khi lưu thông tin: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -252,33 +269,107 @@ namespace PhanMemQuanLyKhachSan
             return list;
         }
 
+        private void TinhTongTien()
+        {
+            try
+            {
+                // Tính tổng tiền dịch vụ
+                int tongTienDichVu = 0;
+                foreach (DataGridViewRow row in dgvChiTietDichVu.Rows)
+                {
+                    string thanhTienStr = row.Cells["Column6"].Value?.ToString().Replace(",", "") ?? "0";
+                    if (int.TryParse(thanhTienStr, out int thanhTien))
+                    {
+                        tongTienDichVu += thanhTien;
+                    }
+                }
+
+                // Tính tiền phòng
+                int tienPhong = 0;
+                if (int.TryParse(txtChiTietGiaPhong.Text, out int giaPhong) &&
+                    int.TryParse(txtChiTietSoDem.Text, out int soDem))
+                {
+                    tienPhong = giaPhong * soDem;
+                    lblThanhTien.Text = tienPhong.ToString("#,##0");
+                }
+
+                // Cập nhật tổng tiền
+                int tongTien = tongTienDichVu + tienPhong;
+                lblChiTietTongTien.Text = tongTien.ToString("#,##0");
+            }
+            catch
+            {
+                lblChiTietTongTien.Text = "0";
+            }
+        }
+
+        private void txtChiTietGiaPhong_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (int.TryParse(txtChiTietGiaPhong.Text, out int giaPhong) &&
+                    int.TryParse(txtChiTietSoDem.Text, out int soDem))
+                {
+                    lblThanhTien.Text = (giaPhong * soDem).ToString("#,##0");
+                }
+                else
+                {
+                    lblThanhTien.Text = "0";
+                }
+                TinhTongTien();
+            }
+            catch
+            {
+                lblThanhTien.Text = "0";
+            }
+        }
+
+        private void txtChiTietSoDem_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (int.TryParse(txtChiTietGiaPhong.Text, out int giaPhong) &&
+                    int.TryParse(txtChiTietSoDem.Text, out int soDem))
+                {
+                    lblThanhTien.Text = (giaPhong * soDem).ToString("#,##0");
+                }
+                else
+                {
+                    lblThanhTien.Text = "0";
+                }
+                TinhTongTien();
+            }
+            catch
+            {
+                lblThanhTien.Text = "0";
+            }
+        }
+
         private void btnThemCuaCTPP_Click(object sender, EventArgs e)
         {
             try
             {
                 DichVu dv = DichVu.GetDichVu(int.Parse(cmbTenDichVu.SelectedValue.ToString()));
                 if (txtSoLuong.Text == "")
-                    throw new Exception("Vui long nhap so luong!");
+                    throw new Exception("Vui lòng nhập số lượng!");
                 int index = dgvChiTietDichVu.Rows.Add();
                 dgvChiTietDichVu.Rows[index].Cells[0].Value = (index + 1).ToString();
                 dgvChiTietDichVu.Rows[index].Cells[1].Value = dv.TenDV;
-                dgvChiTietDichVu.Rows[index].Cells[2].Value = dv.GiaDV + "";
-                dgvChiTietDichVu.Rows[index].Cells[3].Value = txtSoLuong.Text + "";
-                int thanhtien =  dv.GiaDV.Value * int.Parse(txtSoLuong.Text);
-                dgvChiTietDichVu.Rows[index].Cells[4].Value = thanhtien.ToString();
+                dgvChiTietDichVu.Rows[index].Cells[2].Value = string.Format("{0:N0}", dv.GiaDV);
+                dgvChiTietDichVu.Rows[index].Cells[3].Value = txtSoLuong.Text;
+                int thanhtien = dv.GiaDV.Value * int.Parse(txtSoLuong.Text);
+                dgvChiTietDichVu.Rows[index].Cells["Column6"].Value = string.Format("{0:N0}", thanhtien);
+                dgvChiTietDichVu.Rows[index].Cells["id"].Value = dv.DichVuID.ToString();
 
-                dgvChiTietDichVu.Rows[index].Cells["id"].Value = dv.DichVuID + "";
+                TinhTongTien();
+                
+                // Clear số lượng sau khi thêm
+                txtSoLuong.Text = "";
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private void cmbTenDichVu_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string tendv = cmbTenDichVu.SelectedItem.ToString();
-            List<DichVu> listKQTK = DichVu.GetAll();
         }
 
         private void btnXoaCuaCTPP_Click(object sender, EventArgs e)
@@ -287,24 +378,18 @@ namespace PhanMemQuanLyKhachSan
             {
                 dgvChiTietDichVu.Rows.RemoveAt(item.Index);
             }
+            TinhTongTien();
+        }
+
+        private void cmbTenDichVu_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string tendv = cmbTenDichVu.SelectedItem.ToString();
+            List<DichVu> listKQTK = DichVu.GetAll();
         }
 
         private void cbxLoaiPhong_SelectedIndexChanged(object sender, EventArgs e)
         {
            
-        }
-
-        
-        private void txtChiTietGiaPhong_TextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                lblThanhTien.Text = ( int.Parse(txtChiTietGiaPhong.Text) * int.Parse(txtChiTietSoDem.Text)).ToString();
-            }
-            catch 
-            {
-                lblThanhTien.Text = "";
-            }
         }
 
         private void cmbSoPhong_SelectedIndexChanged(object sender, EventArgs e)

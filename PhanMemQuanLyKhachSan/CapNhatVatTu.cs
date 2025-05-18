@@ -87,7 +87,7 @@ namespace PhanMemQuanLyKhachSan
                     return;
                 }
 
-                VatTu s = GetVatTu();
+                VatTu s = GetVatTu(); // Gọi hàm GetVatTu() để tạo đối tượng VatTu mới từ dữ liệu nhập trên form.
                 s.InsertUpdate();
                 MessageBox.Show("Thêm vật tư thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtCapNhatVatTu.Clear();
@@ -122,7 +122,7 @@ namespace PhanMemQuanLyKhachSan
 
                 if (result == DialogResult.Yes)
                 {
-                    int rowIndex = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
+                    int rowIndex = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value; // lấy id vật tư ở cột số 2
                     VatTu.Delete(rowIndex);
                     MessageBox.Show("Xóa vật tư thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     BindGrid(VatTu.GetAll());
@@ -138,10 +138,10 @@ namespace PhanMemQuanLyKhachSan
         {
             if (e.RowIndex >= 0)
             {
-                DataGridViewRow row = this.dgvCapNhatVatTu.Rows[e.RowIndex];
-                int maVT = int.Parse(row.Cells[1].Value.ToString());
-                VatTu db = VatTu.GetVatTu(maVT);
-                txtCapNhatVatTu.Text = db.TenVT.ToString();
+                DataGridViewRow row = this.dgvCapNhatVatTu.Rows[e.RowIndex];    // lấy dòng row vừa click
+                int maVT = int.Parse(row.Cells[1].Value.ToString());  // lấy giá trị cột thứ 2( id)
+                VatTu db = VatTu.GetVatTu(maVT);                      // xuất thông tin từ database
+                txtCapNhatVatTu.Text = db.TenVT.ToString();             // gán tên vào text để người dùng sửa
             }
         }
 
@@ -165,7 +165,7 @@ namespace PhanMemQuanLyKhachSan
                 }
 
                 int vatTuId = (int)dgvCapNhatVatTu.CurrentRow.Cells[1].Value;
-                VatTu db = VatTu.GetVatTu(vatTuId);
+                VatTu db = VatTu.GetVatTu(vatTuId);        // lấy đối tương từ database
                 if (db != null)
                 {
                     db.TenVT = txtCapNhatVatTu.Text.Trim();

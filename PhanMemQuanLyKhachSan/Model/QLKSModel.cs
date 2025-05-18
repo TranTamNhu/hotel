@@ -46,6 +46,11 @@ namespace PhanMemQuanLyKhachSan.Model
                 .Property(e => e.TenLoai)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<Phong>()
+                .Property(e => e.TrangThai)
+                .HasMaxLength(30)
+                .IsUnicode(true);
+
             modelBuilder.Entity<MatKhau>()
                 .Property(e => e.username)
                 .IsUnicode(false);

@@ -49,8 +49,8 @@ namespace PhanMemQuanLyKhachSan
 
         private void RefreshData()
         {
-            List<DichVu> dichVuList = _dichVuController.GetAllDichVu();
-            _dichVuController.PopulateDataGridView(dgvCapNhatDichVu, dichVuList);
+            List<DichVu> dichVuList = _dichVuController.GetAllDichVu();   
+            _dichVuController.PopulateDataGridView(dgvCapNhatDichVu, dichVuList);  //cập nhập lại sau khi làm mới
         }
 
         private void ClearInputs()
@@ -68,13 +68,13 @@ namespace PhanMemQuanLyKhachSan
 
                 // Validate input
                 string errorMessage;
-                if (!_dichVuController.ValidateServiceInput(tenDV, giaDVText, out errorMessage))
+                if (!_dichVuController.ValidateServiceInput(tenDV, giaDVText, out errorMessage))  //kiểm tra tên và giá có hợp lệ không
                 {
                     MessageBox.Show(errorMessage, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                int giaDV = int.Parse(giaDVText);
+                int giaDV = int.Parse(giaDVText);  //chuyển giá từ string sang int
                 DichVu dichVu = _dichVuController.CreateDichVu(tenDV, giaDV);
 
                 _dichVuController.SaveDichVu(dichVu);
@@ -119,12 +119,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 DataGridViewRow row = this.dgvCapNhatDichVu.Rows[e.RowIndex];
                 int dichVuID = int.Parse(row.Cells[1].Value.ToString());
-                DichVu dichVu = _dichVuController.GetDichVu(dichVuID);
+                DichVu dichVu = _dichVuController.GetDichVu(dichVuID); // truy xuất thông tin từ db
 
                 if (dichVu != null)
                 {
-                    txtCapNhatDichVu.Text = dichVu.TenDV;
-                    txtGia.Text = dichVu.GiaDV.ToString();
+                    txtCapNhatDichVu.Text = dichVu.TenDV;  //gán tên vào txt
+                    txtGia.Text = dichVu.GiaDV.ToString(); //gán giá
                 }
             }
         }

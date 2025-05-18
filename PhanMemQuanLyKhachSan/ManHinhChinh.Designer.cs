@@ -526,7 +526,7 @@
             this.btnChiTiet2.TabIndex = 10;
             this.btnChiTiet2.Text = "Chi tiết";
             this.btnChiTiet2.UseVisualStyleBackColor = false;
-            this.btnChiTiet2.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet2.Click += new System.EventHandler(this.btnChitiet2_Click);
             // 
             // lblNgayDi2
             // 
@@ -715,7 +715,7 @@
             this.btnChiTiet3.TabIndex = 10;
             this.btnChiTiet3.Text = "Chi tiết";
             this.btnChiTiet3.UseVisualStyleBackColor = false;
-            this.btnChiTiet3.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet3.Click += new System.EventHandler(this.btnChitiet3_Click);
             // 
             // lblNgayDi3
             // 
@@ -905,7 +905,7 @@
             this.btnChiTiet4.TabIndex = 10;
             this.btnChiTiet4.Text = "Chi tiết";
             this.btnChiTiet4.UseVisualStyleBackColor = false;
-            this.btnChiTiet4.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet4.Click += new System.EventHandler(this.btnChitiet4_Click);
             // 
             // lblNgayDi4
             // 
@@ -1094,7 +1094,7 @@
             this.btnChitiet8.TabIndex = 10;
             this.btnChitiet8.Text = "Chi tiết";
             this.btnChitiet8.UseVisualStyleBackColor = false;
-            this.btnChitiet8.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChitiet8.Click += new System.EventHandler(this.btnChitiet8_Click);
             // 
             // lblNgayDi8
             // 
@@ -1284,7 +1284,7 @@
             this.btnChiTiet7.TabIndex = 10;
             this.btnChiTiet7.Text = "Chi tiết";
             this.btnChiTiet7.UseVisualStyleBackColor = false;
-            this.btnChiTiet7.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet7.Click += new System.EventHandler(this.btnChitiet7_Click);
             // 
             // lblNgayDi7
             // 
@@ -1473,7 +1473,7 @@
             this.btnChiTiet6.TabIndex = 10;
             this.btnChiTiet6.Text = "Chi tiết";
             this.btnChiTiet6.UseVisualStyleBackColor = false;
-            this.btnChiTiet6.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet6.Click += new System.EventHandler(this.btnChitiet6_Click);
             // 
             // lblNgayDi6
             // 
@@ -1662,7 +1662,7 @@
             this.btnChiTiet5.TabIndex = 10;
             this.btnChiTiet5.Text = "Chi tiết";
             this.btnChiTiet5.UseVisualStyleBackColor = false;
-            this.btnChiTiet5.Click += new System.EventHandler(this.btnChitiet1_Click);
+            this.btnChiTiet5.Click += new System.EventHandler(this.btnChitiet5_Click);
             // 
             // lblNgayDi5
             // 

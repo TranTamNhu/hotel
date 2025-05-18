@@ -52,16 +52,16 @@ namespace PhanMemQuanLyKhachSan
                 }
 
                 // Đổ dữ liệu vào combobox - sắp xếp theo PhongID
-                foreach (var phong in phongs.OrderBy(p => p.PhongID))
+                foreach (var phong in phongs.OrderBy(p => p.PhongID))       //duyệt qua danh sách phòng, sắp sếp theo id
                 {
-                    string display = $"Phòng {phong.PhongID}";
-                    roomMappings.Add(display, phong.PhongID);
-                    cmbChonSoPhong.Items.Add(display);
+                    string display = $"Phòng {phong.PhongID}";                     // Tạo chuỗi để hiển thị trong box
+                    roomMappings.Add(display, phong.PhongID);                       // lưu ảnh xạ. chọn phòng 111 thì tìm phòng 111
+                    cmbChonSoPhong.Items.Add(display);                                   
                 }
 
-                cmbChonSoPhong.SelectedIndexChanged += cmbChonSoPhong_SelectedIndexChanged;
+                cmbChonSoPhong.SelectedIndexChanged += cmbChonSoPhong_SelectedIndexChanged;                 //gắn lại sk, chọn phòng khác thì sựu kiện được gọi
 
-                if (cmbChonSoPhong.Items.Count > 0)
+                if (cmbChonSoPhong.Items.Count > 0)                                                           //tự động chọn item đầu tiên
                 {
                     cmbChonSoPhong.SelectedIndex = 0;
                 }

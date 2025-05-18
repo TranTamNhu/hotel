@@ -163,7 +163,6 @@ D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmCapNhatLo
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmCapNhatDichVu.resources
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmCapNhatVatTu.resources
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmDangNhap.resources
-D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.Migrations.InitialCreate.resources
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmThongKe.resources
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmManHinhChinh.resources
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.frmChiTietPhieuPhong.resources
@@ -179,3 +178,5 @@ D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.csproj.CoreC
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQ.D0EF2767.Up2Date
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.exe
 D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.pdb
+D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.Migrations.InitialCreate.resources
+D:\.net\hotel\PhanMemQuanLyKhachSan\obj\Debug\PhanMemQuanLyKhachSan.Migrations.AddTrangThaiToPhong.resources
