@@ -33,6 +33,7 @@
             this.quảnLýPhòngToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quảnLýNhânViênToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quảnLýKháchHàngToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.thốngKêToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlPhong1 = new System.Windows.Forms.Panel();
             this.lblNoiDungNgayDi1 = new System.Windows.Forms.Label();
             this.lblNoiDungNgayDen1 = new System.Windows.Forms.Label();
@@ -202,7 +203,8 @@
             this.msManhinhchinh.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.quảnLýPhòngToolStripMenuItem,
             this.quảnLýNhânViênToolStripMenuItem,
-            this.quảnLýKháchHàngToolStripMenuItem});
+            this.quảnLýKháchHàngToolStripMenuItem,
+            this.thốngKêToolStripMenuItem});
             this.msManhinhchinh.Location = new System.Drawing.Point(2, 60);
             this.msManhinhchinh.Name = "msManhinhchinh";
             this.msManhinhchinh.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
@@ -230,6 +232,13 @@
             this.quảnLýKháchHàngToolStripMenuItem.Size = new System.Drawing.Size(222, 33);
             this.quảnLýKháchHàngToolStripMenuItem.Text = "Quản lý khách hàng";
             this.quảnLýKháchHàngToolStripMenuItem.Click += new System.EventHandler(this.quảnLýKháchHàngToolStripMenuItem_Click);
+            // 
+            // thốngKêToolStripMenuItem
+            // 
+            this.thốngKêToolStripMenuItem.Name = "thốngKêToolStripMenuItem";
+            this.thốngKêToolStripMenuItem.Size = new System.Drawing.Size(170, 33);
+            this.thốngKêToolStripMenuItem.Text = "Thống kê";
+            this.thốngKêToolStripMenuItem.Click += new System.EventHandler(this.thốngKêToolStripMenuItem_Click);
             // 
             // pnlPhong1
             // 
@@ -1791,6 +1800,7 @@
         private System.Windows.Forms.ToolStripMenuItem quảnLýPhòngToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quảnLýNhânViênToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quảnLýKháchHàngToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem thốngKêToolStripMenuItem;
         private System.Windows.Forms.Panel pnlPhong1;
         private System.Windows.Forms.Button btnChiTiet1;
         private System.Windows.Forms.Label lblNgayDi1;
