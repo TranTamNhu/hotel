@@ -131,7 +131,7 @@ namespace PhanMemQuanLyKhachSan
             var chiTietHoaDons = context.ChiTietHoaDons     // truy cập vào bảng
                 .Include(ct => ct.DichVu)                    //nạp đối tượng dịch vự lq đến cthd
                 .Where(ct => ct.HoaDonID == hoaDonId && ct.DichVu != null)       // chỉ lấy các chi tiết của hóa đơn hiện tại (HoaDonID = hoaDonId)
-                .Select(ct => new              // lấy ra
+                .Select(ct => new              // lấy ra các trường cần hiển
                 {
                     TenDV = ct.DichVu.TenDV,
                     ct.SoLuong,

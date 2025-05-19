@@ -161,14 +161,14 @@ namespace PhanMemQuanLyKhachSan
                 kh = kh.InsertUpdate();
              
 
-                List<DichVu> listDV = GetListDichVu();   // lấy danh sách dv 
+                List<DichVu> listDV = GetListDichVu();   // lấy danh sách dv đã chọn
             
 
-                //insert hoa don
-                HoaDon hd = GetHoaDon();
+                
+                HoaDon hd = GetHoaDon();                    // lấy thông tin hoá đơn
 
-                //insert  khách hàng trước khi insert hóa đơn
-                hd.KhachHangID = kh.KhachHangID;
+               
+                hd.KhachHangID = kh.KhachHangID;             // gán kh ở trên vào id kh hoá đơn
 
                 // Tính tổng tiền từ giá trị đã được tính
                 if (int.TryParse(lblChiTietTongTien.Text.Replace(",", ""), out int tongTien))
@@ -234,7 +234,7 @@ namespace PhanMemQuanLyKhachSan
             try
             {
                 SetGridViewStyle(dgvChiTietDichVu);
-                FillDichVuCombobox(DichVu.GetAll());
+                FillDichVuCombobox(DichVu.GetAll());                                //nạp dl cho cbb từ db
                 FillLoaiPhongCombobox(LoaiPhong.GetAll());
                 FillTenBookingCombobox(Booking.GetAll());
                 FillComboboxNhanVien(cmbNhanVien, NhanVien.GetAll());
@@ -297,7 +297,7 @@ namespace PhanMemQuanLyKhachSan
                             // Hiển thị thông tin booking
                             if (hoaDon.BookingID.HasValue)
                             {
-                                var booking = Booking.GetBooking(hoaDon.BookingID.Value);
+                                var booking = Booking.GetBooking(hoaDon.BookingID.Value);                   //nếu hd có liên kết booking thì hiển đúng booking
                                 if (booking != null)
                                 {
                                     cmbTenBooking.SelectedValue = booking.BookingID;
@@ -308,7 +308,7 @@ namespace PhanMemQuanLyKhachSan
                             lblChiTietTongTien.Text = hoaDon.TongTien?.ToString("#,##0") ?? "0";
 
                             // Load chi tiết dịch vụ
-                            if (hoaDon.ChiTietHoaDons != null && hoaDon.ChiTietHoaDons.Any())
+                            if (hoaDon.ChiTietHoaDons != null && hoaDon.ChiTietHoaDons.Any())                         //Hiển thị tổng tiền hóa đơn và danh sách dịch vụ đã dùng vào ggv
                             {
                                 BindGrid(hoaDon.ChiTietHoaDons.ToList());
                             }
@@ -446,7 +446,7 @@ namespace PhanMemQuanLyKhachSan
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi tính tổng tiền: {ex.Message}");
+              
                 lblChiTietTongTien.Text = "0";
             }
         }
@@ -512,7 +512,7 @@ namespace PhanMemQuanLyKhachSan
 
                 int thanhTien = dv.GiaDV.GetValueOrDefault() * soLuong;
 
-                int index = dgvChiTietDichVu.Rows.Add();
+                int index = dgvChiTietDichVu.Rows.Add();           //them dong mới
                 dgvChiTietDichVu.Rows[index].Cells["STT"].Value = (index + 1).ToString(); // STT
                 dgvChiTietDichVu.Rows[index].Cells["TenDV"].Value = dv.TenDV; // Tên dịch vụ
                 dgvChiTietDichVu.Rows[index].Cells["Column3"].Value = string.Format("{0:#,##0 VNĐ}", dv.GiaDV); // Giá
