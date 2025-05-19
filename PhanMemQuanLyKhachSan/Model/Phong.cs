@@ -71,34 +71,40 @@
 
         public void InsertUpdate()
         {
-            using (var context = new QLKSModel())
+            try
             {
-                var phong = context.Phongs.FirstOrDefault(p => p.PhongID == this.PhongID);
-                if (phong != null)
+                using (var context = new QLKSModel())
                 {
-                    phong.LoaiPhongID = this.LoaiPhongID;
-                    phong.GiaPhong = this.GiaPhong;
-                    phong.TrangThai = this.TrangThai;
+                    context.Phongs.AddOrUpdate(this);
+                    context.SaveChanges();
                 }
-                else
-                {
-                    context.Phongs.Add(this);
-                }
-                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Phong.InsertUpdate: {ex.Message}");
+                throw;
             }
         }
 
         public void CapNhatTrangThai(string trangThaiMoi)
         {
-            using (var context = new QLKSModel())
+            try
             {
-                var phong = context.Phongs.FirstOrDefault(p => p.PhongID == this.PhongID);
-                if (phong != null)
+                using (var context = new QLKSModel())
                 {
-                    phong.TrangThai = trangThaiMoi; 
-                    context.SaveChanges();
-                    this.TrangThai = trangThaiMoi;
+                    var phong = context.Phongs.Find(this.PhongID);
+                    if (phong != null)
+                    {
+                        phong.TrangThai = trangThaiMoi;
+                        context.SaveChanges();
+                        this.TrangThai = trangThaiMoi; // Update the current instance
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating room status: {ex.Message}");
+                throw;
             }
         }
     }

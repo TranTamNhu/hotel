@@ -18,87 +18,126 @@ namespace PhanMemQuanLyKhachSan
         {
             InitializeComponent();
         }
-
-        public void SetBookingRoom()
+          
+        private void UpdateRoomStatus(int phongId, Panel pnlPhong, Label lblTenBooking, Label lblTenKhach,
+            Label lblSoKhach, Label lblQuocTich, Label lblNgayDen, Label lblNgayDi)
         {
-            var listHD = HoaDon.GetAll();
-            var listPhong = Phong.GetAll();
-
-            // Cập nhật trạng thái cho tất cả các phòng
-            void UpdateRoomStatus(int phongId, Panel pnlPhong, Label lblNoiDungTenBooking,
-                Label lblNoiDungTenKhach, Label lblNoiDungSoKhach, Label lblNoiDungQuocTich,
-                Label lblNoiDungNgayDen, Label lblNoiDungNgayDi)
+            try
             {
-                var phong = listPhong.FirstOrDefault(p => p.PhongID == phongId);
-                var hoaDon = listHD.LastOrDefault(p => p.PhongID != null && p.PhongID == phongId);// tìm hoá đơn mới nhất của phòng đó
+                // Reset all labels first
+                lblTenBooking.Text = ".........................................";
+                lblTenKhach.Text = ".........................................";
+                lblSoKhach.Text = ".........................................";
+                lblQuocTich.Text = ".........................................";
+                lblNgayDen.Text = ".........................................";
+                lblNgayDi.Text = ".........................................";
 
-                // Cập nhật màu nền dựa trên trạng thái
-                if (phong != null)
+                var phong = Phong.GetPhong(phongId);
+                if (phong == null) return;
+
+              
+                switch (phong.TrangThai)     //cập nhật màu theo trạng thái phòng
                 {
-                    switch (phong.TrangThai)
-                    {
-                        case "Đang ở":
-                            pnlPhong.BackColor = Color.LightPink; 
-                            break;
-                        case "Đã đặt":
-                            pnlPhong.BackColor = Color.LightYellow; 
-                            break;
-                        case "Bảo trì":
-                            pnlPhong.BackColor = Color.LightGray; 
-                            break;
-                        default:
-                            pnlPhong.BackColor = Color.LightGreen;
-                            break;
-                    }
+                    case "Đang ở":
+                        pnlPhong.BackColor = Color.LightPink;
+                        break;
+                    case "Đã đặt":
+                        pnlPhong.BackColor = Color.LightYellow;
+                        break;
+                    case "Bảo trì":
+                        pnlPhong.BackColor = Color.LightGray;
+                        break;
+                    default: // "Trống"
+                        pnlPhong.BackColor = Color.LightGreen;
+                        break;
                 }
 
-                // Cập nhật thông tin hóa đơn nếu có
-                if (hoaDon != null)
+                if (phong.TrangThai == "Đang ở")
                 {
-                    DateTime dt = DateTime.ParseExact(hoaDon.NgayHD, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                    if (dt.Date >= DateTime.Now)
+                   
+                    var hoaDon = HoaDon.GetHoaDonByPhongID(phongId);
+                    
+                    if (hoaDon != null && hoaDon.KhachHang != null)
                     {
+                        // Hiển thị thông tin booking
                         if (hoaDon.BookingID.HasValue)
                         {
-                            Booking findBook = Booking.GetBooking(hoaDon.BookingID.Value);
-                            if (findBook != null)
+                            var booking = Booking.GetBooking(hoaDon.BookingID.Value);
+                            if (booking != null)
                             {
-                                lblNoiDungTenBooking.Text = findBook.TenBooking;
+                                lblTenBooking.Text = booking.TenBooking;
                             }
                         }
-                        lblNoiDungTenKhach.Text = hoaDon.KhachHang.TenKH;
-                        lblNoiDungSoKhach.Text = hoaDon.SoKhach + "";
-                        lblNoiDungQuocTich.Text = hoaDon.KhachHang.QuocTich;
-                        lblNoiDungNgayDen.Text = dt.AddDays(0 - hoaDon.SoDem.Value).ToString("dd/MM/yyyy");
-                        lblNoiDungNgayDi.Text = hoaDon.NgayHD;
+                        else if (!string.IsNullOrEmpty(hoaDon.TenLoai))
+                        {
+                            lblTenBooking.Text = hoaDon.TenLoai;
+                        }
+
+                        // Hiển thị thông tin khách hàng
+                        lblTenKhach.Text = hoaDon.KhachHang.TenKH;
+                        lblSoKhach.Text = hoaDon.SoKhach?.ToString() ?? "0";
+                        lblQuocTich.Text = hoaDon.KhachHang.QuocTich;
+
+                        // Hiển thị thông tin ngày
+                        if (!string.IsNullOrEmpty(hoaDon.NgayHD))
+                        {
+                            if (DateTime.TryParseExact(hoaDon.NgayHD, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime ngayDi))  //chuyển đổi hoaDon.NgayHD từ chuỗi → kiểu DateTime,Nếu parse thành công → gán vào biến ngayDi (ngày đi)
+                            {
+                                lblNgayDi.Text = ngayDi.ToString("dd/MM/yyyy");   //Hiển thị ngayDi lên label (dạng dd/MM/yyyy)
+
+                                if (hoaDon.SoDem.HasValue)
+                                {
+                                    DateTime ngayDen = ngayDi.AddDays(-hoaDon.SoDem.Value);  //tính số ngày đi
+                                    lblNgayDen.Text = ngayDen.ToString("dd/MM/yyyy");
+                                }
+                            }
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+              
+                MessageBox.Show($"Lỗi cập nhật trạng thái phòng {phongId}: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-            // Cập nhật cho từng phòng
-            UpdateRoomStatus(1, pnlPhong1, lblNoiDungTenBooking1, lblNoiDungTenKhach1,
-                lblNoiDungSoKhach1, lblNoiDungQuocTich1, lblNoiDungNgayDen1, lblNoiDungNgayDi1);
+        public void SetBookingRoom()
+        {
+            try
+            {
+                // Update each room's status
+                UpdateRoomStatus(1, pnlPhong1, lblNoiDungTenBooking1, lblNoiDungTenKhach1,
+                    lblNoiDungSoKhach1, lblNoiDungQuocTich1, lblNoiDungNgayDen1, lblNoiDungNgayDi1);
 
-            UpdateRoomStatus(2, pnlPhong2, lblNoiDungTenBooking2, lblNoiDungTenKhach2,
-                lblNoiDungSoKhach2, lblNoiDungQuocTich2, lblNoiDungNgayDen2, lblNoiDungNgayDi2);
+                UpdateRoomStatus(2, pnlPhong2, lblNoiDungTenBooking2, lblNoiDungTenKhach2,
+                    lblNoiDungSoKhach2, lblNoiDungQuocTich2, lblNoiDungNgayDen2, lblNoiDungNgayDi2);
 
-            UpdateRoomStatus(3, pnlPhong3, lblNoiDungTenBooking3, lblNoiDungTenKhach3,
-                lblNoiDungSoKhach3, lblNoiDungQuocTich3, lblNoiDungNgayDen3, lblNoiDungNgayDi3);
+                UpdateRoomStatus(3, pnlPhong3, lblNoiDungTenBooking3, lblNoiDungTenKhach3,
+                    lblNoiDungSoKhach3, lblNoiDungQuocTich3, lblNoiDungNgayDen3, lblNoiDungNgayDi3);
 
-            UpdateRoomStatus(4, pnlPhong4, lblNoiDungTenBooking4, lblNoiDungTenKhach4,
-                lblNoiDungSoKhach4, lblNoiDungQuocTich4, lblNoiDungNgayDen4, lblNoiDungNgayDi4);
+                UpdateRoomStatus(4, pnlPhong4, lblNoiDungTenBooking4, lblNoiDungTenKhach4,
+                    lblNoiDungSoKhach4, lblNoiDungQuocTich4, lblNoiDungNgayDen4, lblNoiDungNgayDi4);
 
-            UpdateRoomStatus(5, pnlPhong5, lblNoiDungTenBooking5, lblNoiDungTenKhach5,
-                lblNoiDungSoKhach5, lblNoiDungQuocTich5, lblNoiDungNgayDen5, lblNoiDungNgayDi5);
+                UpdateRoomStatus(5, pnlPhong5, lblNoiDungTenBooking5, lblNoiDungTenKhach5,
+                    lblNoiDungSoKhach5, lblNoiDungQuocTich5, lblNoiDungNgayDen5, lblNoiDungNgayDi5);
 
-            UpdateRoomStatus(6, pnlPhong6, lblNoiDungTenBooking6, lblNoiDungTenKhach6,
-                lblNoiDungSoKhach6, lblNoiDungQuocTich6, lblNoiDungNgayDen6, lblNoiDungNgayDi6);
+                UpdateRoomStatus(6, pnlPhong6, lblNoiDungTenBooking6, lblNoiDungTenKhach6,
+                    lblNoiDungSoKhach6, lblNoiDungQuocTich6, lblNoiDungNgayDen6, lblNoiDungNgayDi6);
 
-            UpdateRoomStatus(7, pnlPhong7, lblNoiDungTenBooking7, lblNoiDungTenKhach7,
-                lblNoiDungSoKhach7, lblNoiDungQuocTich7, lblNoiDungNgayDen7, lblNoiDungNgayDi7);
+                UpdateRoomStatus(7, pnlPhong7, lblNoiDungTenBooking7, lblNoiDungTenKhach7,
+                    lblNoiDungSoKhach7, lblNoiDungQuocTich7, lblNoiDungNgayDen7, lblNoiDungNgayDi7);
 
-            UpdateRoomStatus(8, pnlPhong8, lblNoiDungTenBooking8, lblNoiDungTenKhach8,
-                lblNoiDungSoKhach8, lblNoiDungQuocTich8, lblNoiDungNgayDen8, lblNoiDungNgayDi8);
+                UpdateRoomStatus(8, pnlPhong8, lblNoiDungTenBooking8, lblNoiDungTenKhach8,
+                    lblNoiDungSoKhach8, lblNoiDungQuocTich8, lblNoiDungNgayDen8, lblNoiDungNgayDi8);
+
+                // Force the form to refresh
+                this.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi cập nhật trạng thái phòng: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnChitiet1_Click(object sender, EventArgs e)
@@ -152,7 +191,7 @@ namespace PhanMemQuanLyKhachSan
         {
             frmThongKe frmThongKe = new frmThongKe();
             frmThongKe.Show();
-
+         
         }
 
 
@@ -235,12 +274,12 @@ namespace PhanMemQuanLyKhachSan
                 phong.CapNhatTrangThai("Trống");
 
                 // Xóa thông tin hiển thị
-                lblNoiDungTenBooking1.Text = ".........................................";
-                lblNoiDungTenKhach1.Text = ".........................................";
-                lblNoiDungSoKhach1.Text = ".........................................";
-                lblNoiDungQuocTich1.Text = ".........................................";
-                lblNoiDungNgayDen1.Text = ".........................................";
-                lblNoiDungNgayDi1.Text = ".........................................";
+            lblNoiDungTenBooking1.Text = ".........................................";
+            lblNoiDungTenKhach1.Text = ".........................................";
+            lblNoiDungSoKhach1.Text = ".........................................";
+            lblNoiDungQuocTich1.Text = ".........................................";
+            lblNoiDungNgayDen1.Text = ".........................................";
+            lblNoiDungNgayDi1.Text = ".........................................";
 
                 // Cập nhật lại hiển thị các phòng
                 SetBookingRoom();
@@ -260,12 +299,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking2.Text = ".........................................";
-                lblNoiDungTenKhach2.Text = ".........................................";
-                lblNoiDungSoKhach2.Text = ".........................................";
-                lblNoiDungQuocTich2.Text = ".........................................";
-                lblNoiDungNgayDen2.Text = ".........................................";
-                lblNoiDungNgayDi2.Text = ".........................................";
+            lblNoiDungTenBooking2.Text = ".........................................";
+            lblNoiDungTenKhach2.Text = ".........................................";
+            lblNoiDungSoKhach2.Text = ".........................................";
+            lblNoiDungQuocTich2.Text = ".........................................";
+            lblNoiDungNgayDen2.Text = ".........................................";
+            lblNoiDungNgayDi2.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -284,12 +323,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking3.Text = ".........................................";
-                lblNoiDungTenKhach3.Text = ".........................................";
-                lblNoiDungSoKhach3.Text = ".........................................";
-                lblNoiDungQuocTich3.Text = ".........................................";
-                lblNoiDungNgayDen3.Text = ".........................................";
-                lblNoiDungNgayDi3.Text = ".........................................";
+            lblNoiDungTenBooking3.Text = ".........................................";
+            lblNoiDungTenKhach3.Text = ".........................................";
+            lblNoiDungSoKhach3.Text = ".........................................";
+            lblNoiDungQuocTich3.Text = ".........................................";
+            lblNoiDungNgayDen3.Text = ".........................................";
+            lblNoiDungNgayDi3.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -308,12 +347,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking4.Text = ".........................................";
-                lblNoiDungTenKhach4.Text = ".........................................";
-                lblNoiDungSoKhach4.Text = ".........................................";
-                lblNoiDungQuocTich4.Text = ".........................................";
-                lblNoiDungNgayDen4.Text = ".........................................";
-                lblNoiDungNgayDi4.Text = ".........................................";
+            lblNoiDungTenBooking4.Text = ".........................................";
+            lblNoiDungTenKhach4.Text = ".........................................";
+            lblNoiDungSoKhach4.Text = ".........................................";
+            lblNoiDungQuocTich4.Text = ".........................................";
+            lblNoiDungNgayDen4.Text = ".........................................";
+            lblNoiDungNgayDi4.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -332,12 +371,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking5.Text = ".........................................";
-                lblNoiDungTenKhach5.Text = ".........................................";
-                lblNoiDungSoKhach5.Text = ".........................................";
-                lblNoiDungQuocTich5.Text = ".........................................";
-                lblNoiDungNgayDen5.Text = ".........................................";
-                lblNoiDungNgayDi5.Text = ".........................................";
+            lblNoiDungTenBooking5.Text = ".........................................";
+            lblNoiDungTenKhach5.Text = ".........................................";
+            lblNoiDungSoKhach5.Text = ".........................................";
+            lblNoiDungQuocTich5.Text = ".........................................";
+            lblNoiDungNgayDen5.Text = ".........................................";
+            lblNoiDungNgayDi5.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -355,12 +394,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking6.Text = ".........................................";
-                lblNoiDungTenKhach6.Text = ".........................................";
-                lblNoiDungSoKhach6.Text = ".........................................";
-                lblNoiDungQuocTich6.Text = ".........................................";
-                lblNoiDungNgayDen6.Text = ".........................................";
-                lblNoiDungNgayDi6.Text = ".........................................";
+            lblNoiDungTenBooking6.Text = ".........................................";
+            lblNoiDungTenKhach6.Text = ".........................................";
+            lblNoiDungSoKhach6.Text = ".........................................";
+            lblNoiDungQuocTich6.Text = ".........................................";
+            lblNoiDungNgayDen6.Text = ".........................................";
+            lblNoiDungNgayDi6.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -378,12 +417,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking7.Text = ".........................................";
-                lblNoiDungTenKhach7.Text = ".........................................";
-                lblNoiDungSoKhach7.Text = ".........................................";
-                lblNoiDungQuocTich7.Text = ".........................................";
-                lblNoiDungNgayDen7.Text = ".........................................";
-                lblNoiDungNgayDi7.Text = ".........................................";
+            lblNoiDungTenBooking7.Text = ".........................................";
+            lblNoiDungTenKhach7.Text = ".........................................";
+            lblNoiDungSoKhach7.Text = ".........................................";
+            lblNoiDungQuocTich7.Text = ".........................................";
+            lblNoiDungNgayDen7.Text = ".........................................";
+            lblNoiDungNgayDi7.Text = ".........................................";
 
                 SetBookingRoom();
 
@@ -401,12 +440,12 @@ namespace PhanMemQuanLyKhachSan
             {
                 phong.CapNhatTrangThai(Phong.TrangThaiPhong.Trong);
 
-                lblNoiDungTenBooking8.Text = ".........................................";
-                lblNoiDungTenKhach8.Text = ".........................................";
-                lblNoiDungSoKhach8.Text = ".........................................";
-                lblNoiDungQuocTich8.Text = ".........................................";
-                lblNoiDungNgayDen8.Text = ".........................................";
-                lblNoiDungNgayDi8.Text = ".........................................";
+            lblNoiDungTenBooking8.Text = ".........................................";
+            lblNoiDungTenKhach8.Text = ".........................................";
+            lblNoiDungSoKhach8.Text = ".........................................";
+            lblNoiDungQuocTich8.Text = ".........................................";
+            lblNoiDungNgayDen8.Text = ".........................................";
+            lblNoiDungNgayDi8.Text = ".........................................";
 
                 SetBookingRoom();
 

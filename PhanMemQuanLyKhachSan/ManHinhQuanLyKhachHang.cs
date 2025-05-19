@@ -81,68 +81,65 @@ namespace PhanMemQuanLyKhachSan
 
         private void btnLoc_Click(object sender, EventArgs e)
         {
-            List<KhachHang> listkh = new List<KhachHang>();
-            List<HoaDon> listHD = HoaDon.GetAll();
-
-            // Sử dụng dtpTuNgay làm ngày duy nhất để lọc
-            DateTime tungay = DateTime.Parse(dtpTuNgay.Text);
-
-            // Danh sách các định dạng ngày để thử
-            string[] dateFormats = {
-        "dd/MM/yyyy",
-        "MM/dd/yyyy",
-        "yyyy-MM-dd",
-        "dd-MM-yyyy",
-        "dd.MM.yyyy"
-    };
-
-            foreach (var item in listHD)
+            try
             {
-                try
+                List<KhachHang> listkh = new List<KhachHang>();
+                List<HoaDon> listHD = HoaDon.GetAll();
+
+                // Lấy ngày từ DateTimePicker và chuyển về định dạng dd/MM/yyyy
+                string ngayLoc = dtpTuNgay.Value.ToString("dd/MM/yyyy");
+
+                foreach (var item in listHD)
                 {
-                    // Kiểm tra và parse ngày
-                    DateTime dt = ParseDateFlexibly(item.NgayHD, dateFormats);
+                    if (string.IsNullOrEmpty(item.NgayHD))
+                        continue;
 
-                    // So sánh với ngày được chọn
-                    if (dt.Date == tungay.Date)
+                    // So sánh trực tiếp chuỗi ngày
+                    if (item.NgayHD == ngayLoc)
                     {
-                        KhachHang kh = new KhachHang();
-                        kh.KhachHangID = (int)item.KhachHangID;
-                        kh.TenKH = item.KhachHang?.TenKH;
-                        kh.QuocTich = item.KhachHang?.QuocTich;
-
-                        // Chỉ thêm nếu không null
-                        if (kh.KhachHangID != 0 && !string.IsNullOrEmpty(kh.TenKH))
+                        if (item.KhachHang != null)
                         {
-                            listkh.Add(kh);
+                            KhachHang kh = new KhachHang
+                            {
+                                KhachHangID = item.KhachHang.KhachHangID,
+                                TenKH = item.KhachHang.TenKH,
+                                QuocTich = item.KhachHang.QuocTich
+                            };
+
+                            // Chỉ thêm nếu có đủ thông tin
+                            if (!string.IsNullOrEmpty(kh.TenKH))
+                            {
+                                listkh.Add(kh);
+                            }
                         }
                     }
                 }
-                catch (FormatException)
+
+                // Loại bỏ các bản ghi trùng lặp
+                listkh = listkh
+                    .GroupBy(x => x.KhachHangID)
+                    .Select(g => g.First())
+                    .ToList();
+
+                if (listkh.Count > 0)
                 {
-                    // Ghi log hoặc bỏ qua hóa đơn không có ngày hợp lệ
-                    Console.WriteLine($"Không thể parse ngày: {item.NgayHD}");
+                    BindGrid(listkh);
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy khách hàng nào trong ngày này.", "Thông báo", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-
-            // Loại bỏ các bản ghi trùng lặp
-            listkh = listkh
-                .GroupBy(x => x.KhachHangID)
-                .Select(g => g.First())
-                .ToList();
-
-            if (listkh.Count > 0)
+            catch (Exception ex)
             {
-                BindGrid(listkh);
-            }
-            else
-            {
-                MessageBox.Show("Không tìm thấy khách hàng nào trong ngày này.");
+                MessageBox.Show($"Có lỗi xảy ra: {ex.Message}", "Lỗi", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // Phương thức parse ngày linh hoạt
-        private DateTime ParseDateFlexibly(string dateString, string[] formats)
+        private DateTime ParseDateFlexibly(string dateString, string[] formats)            //hàm sử lí parsang time
         {
             if (string.IsNullOrWhiteSpace(dateString))
             {
@@ -179,8 +176,8 @@ namespace PhanMemQuanLyKhachSan
 
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
-            List<KhachHang> listKQTK = KhachHang.GetAll();
-            var listKhacHang = listKQTK.Where(p => (p is KhachHang) && (p as KhachHang).TenKH.ToLower().Contains(txtTimKiem.Text.ToLower())).ToList();
+            List<KhachHang> listKQTK = KhachHang.GetAll();                      //lấy danh sách trong db
+            var listKhacHang = listKQTK.Where(p => (p is KhachHang) && (p as KhachHang).TenKH.ToLower().Contains(txtTimKiem.Text.ToLower())).ToList();  // tìm khách hàng có tên chứa từ khoá
             if (listKhacHang.Count > 0)
             {
                 BindGrid(listKhacHang);

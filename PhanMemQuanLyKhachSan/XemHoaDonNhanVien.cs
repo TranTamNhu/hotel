@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.Entity;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using PhanMemQuanLyKhachSan.Model;
+using System.Data.Entity;
 
 namespace PhanMemQuanLyKhachSan
 {
@@ -49,12 +45,12 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                var hoaDons = context.HoaDons
-                    .Include(h => h.Phong)
+                var hoaDons = context.HoaDons                         // truy cập vào bảng hoá đơn
+                    .Include(h => h.Phong)                           //tải thông tin phòng cùng với hoá đơn
                     .Include(h => h.Phong.LoaiPhong)
                     .Include(h => h.KhachHang)
-                    .Where(h => h.NhanVienID == nhanVienId)
-                    .Select(h => new
+                    .Where(h => h.NhanVienID == nhanVienId)                //lọc hoá đơn theo id của nhân viên
+                    .Select(h => new                             //Ánh xạ kết quả thành đối tượng ẩn danh mới với các thuộc tính cần thiết
                     {
                         h.HoaDonID,
                         h.NgayHD,
@@ -72,17 +68,16 @@ namespace PhanMemQuanLyKhachSan
                         h.NgayHD,
                         h.TongTien,
                         h.TenKhachHang,
-                        TenPhong = string.IsNullOrEmpty(h.TenLoaiPhong) 
-                            ? $"Phòng {h.PhongID}" 
+                        TenPhong = string.IsNullOrEmpty(h.TenLoaiPhong)
+                            ? $"Phòng {h.PhongID}"
                             : $"Phòng {h.PhongID} - {h.TenLoaiPhong}",
                         h.SoKhach,
                         h.SoDem
                     })
-                    .ToList();
+                    .ToList();                 //thực thi truy vấn chuyển thành ds
 
                 dgvHoaDon.DataSource = hoaDons;
 
-                // Đặt tiêu đề cho các cột
                 dgvHoaDon.Columns["HoaDonID"].HeaderText = "Mã hóa đơn";
                 dgvHoaDon.Columns["NgayHD"].HeaderText = "Ngày lập";
                 dgvHoaDon.Columns["TongTien"].HeaderText = "Tổng tiền";
@@ -91,7 +86,6 @@ namespace PhanMemQuanLyKhachSan
                 dgvHoaDon.Columns["SoKhach"].HeaderText = "Số khách";
                 dgvHoaDon.Columns["SoDem"].HeaderText = "Số đêm";
 
-                // Format số tiền
                 dgvHoaDon.Columns["TongTien"].DefaultCellStyle.Format = "#,##0 VNĐ";
             }
             catch (Exception ex)
@@ -104,8 +98,9 @@ namespace PhanMemQuanLyKhachSan
         {
             if (dgvHoaDon.SelectedRows.Count > 0)
             {
-                int hoaDonId = Convert.ToInt32(dgvHoaDon.SelectedRows[0].Cells["HoaDonID"].Value);
-                XemChiTietHoaDon formChiTiet = new XemChiTietHoaDon(hoaDonId);
+                int hoaDonId = Convert.ToInt32(dgvHoaDon.SelectedRows[0].Cells["HoaDonID"].Value);  //lấy giá trị hoá đơn id được chon
+
+                XemChiTietHoaDon formChiTiet = new XemChiTietHoaDon(hoaDonId);           //mở form chi tiết vs id hoá đơn đó
                 formChiTiet.ShowDialog();
             }
             else
@@ -119,4 +114,4 @@ namespace PhanMemQuanLyKhachSan
             this.Close();
         }
     }
-} 
+}

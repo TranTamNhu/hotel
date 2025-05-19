@@ -108,7 +108,7 @@ namespace PhanMemQuanLyKhachSan
             {
                 if (dgvLichLamViec.SelectedRows.Count > 0)
                 {
-                    int nhanVienId = Convert.ToInt32(dgvLichLamViec.SelectedRows[0].Cells["id"].Value);
+                    int nhanVienId = Convert.ToInt32(dgvLichLamViec.SelectedRows[0].Cells["id"].Value);    //lấy id nhân viên từ đong
                     
                     // Kiểm tra xem nhân viên có hóa đơn nào không
                     var hoaDons = context.HoaDons.Where(h => h.NhanVienID == nhanVienId).ToList();

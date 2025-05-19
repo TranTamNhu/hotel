@@ -81,9 +81,9 @@ namespace PhanMemQuanLyKhachSan
         private void LoadThongTinLoaiPhong()
         {
             if (cmbChonSoPhong.SelectedItem == null) return;
-
-            string selectedItem = cmbChonSoPhong.SelectedItem.ToString();
-            if (!roomMappings.TryGetValue(selectedItem, out int phongID))
+             
+            string selectedItem = cmbChonSoPhong.SelectedItem.ToString();          //lấy phongID từ chuỗi cbb hiển thị
+            if (!roomMappings.TryGetValue(selectedItem, out int phongID))         //mp để tra phòng tương ứng
             {
                 MessageBox.Show("Không tìm thấy ID phòng tương ứng!", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -98,14 +98,13 @@ namespace PhanMemQuanLyKhachSan
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
-            // Reset các RadioButton
+                 // xoá radio trc khi set đúng cái tương ứng
             rdoStandard.Checked = false;
             rdoSuperior.Checked = false;
             rdoDeluxe.Checked = false;
 
             // Set RadioButton tương ứng
-            switch (phong.LoaiPhongID)
+            switch (phong.LoaiPhongID)                               // lấy idloaiphong
             {
                 case 1: rdoStandard.Checked = true; break;
                 case 2: rdoDeluxe.Checked = true; break;

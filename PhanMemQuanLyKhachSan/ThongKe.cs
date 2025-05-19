@@ -1,15 +1,10 @@
-﻿using PhanMemQuanLyKhachSan.Model;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Globalization;
 using System.Windows.Forms.DataVisualization.Charting;
+using PhanMemQuanLyKhachSan.Model;
+using System.Linq;
+using System.Globalization;
 
 namespace PhanMemQuanLyKhachSan
 {
@@ -18,35 +13,6 @@ namespace PhanMemQuanLyKhachSan
         public frmThongKe()
         {
             InitializeComponent();
-            SetupChart();
-        }
-
-        private void SetupChart()
-        {
-            // Thiết lập định dạng cho biểu đồ
-            chart1.ChartAreas[0].AxisY.LabelStyle.Format = "{0:#,##0} VNĐ";
-            chart1.ChartAreas[0].AxisX.LabelStyle.Format = "dd/MM/yyyy";
-            chart1.ChartAreas[0].AxisX.Interval = 1;
-            chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -45;
-            
-            // Thiết lập series
-            chart1.Series["Tổng Tiền"].ChartType = SeriesChartType.Column;
-            chart1.Series["Tổng Tiền"].IsValueShownAsLabel = true;
-            chart1.Series["Tổng Tiền"].LabelFormat = "{0:#,##0} VNĐ";
-        }
-
-        private DateTime? ParseNgayHD(string ngayHD)
-        {
-            if (DateTime.TryParseExact(ngayHD, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
-            {
-                return result;
-            }
-            return null;
-        }
-
-        private void Label1_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void btnTroVeCuaThongKe_Click(object sender, EventArgs e)
@@ -62,42 +28,60 @@ namespace PhanMemQuanLyKhachSan
                 {
                     // Lấy tổng số khách hàng
                     int soKhachHang = context.KhachHangs.Count();
-                    lblSoKhachHang.Text = soKhachHang.ToString("#,##0");
+                    lblSoKhachHang.Text = soKhachHang.ToString("N0");
 
-                    // Lấy tổng doanh thu từ 2025 trở đi
-                    var hoaDons = context.HoaDons.ToList();
-                    var tongDoanhThu = hoaDons
-                        .Where(h => ParseNgayHD(h.NgayHD)?.Year >= 2025)
-                        .Sum(h => h.TongTien) ?? 0;
-                    lblDoanhThu.Text = tongDoanhThu.ToString("#,##0") + " VNĐ";
+                    // Reset chart completely
+                    chart1.Series.Clear();
+                    chart1.Series.Add(new Series("Tổng Tiền"));
+                    chart1.Series[0].ChartType = SeriesChartType.Column;
+                    chart1.Series[0].Color = Color.FromArgb(135, 206, 235);
 
-                    // Cập nhật biểu đồ chỉ hiển thị từ 2025
-                    var doanhThuTheoThang = hoaDons
-                        .Where(h => ParseNgayHD(h.NgayHD)?.Year >= 2025)
-                        .GroupBy(h => ParseNgayHD(h.NgayHD))
-                        .Where(g => g.Key.HasValue)
-                        .Select(g => new { 
-                            Ngay = g.Key.Value,
-                            TongTien = g.Sum(h => h.TongTien) ?? 0 
+                    // Lấy dữ liệu hóa đơn năm 2025 và nhóm theo tháng
+                    var hoaDonTheoThang = context.HoaDons
+                        .AsEnumerable()
+                        .Where(h => h.NgayHD != null && h.NgayHD.Contains("/2025"))
+                        .GroupBy(h => int.Parse(h.NgayHD.Split('/')[1])) // Lấy tháng từ ngày
+                        .OrderBy(g => g.Key)
+                        .Select(g => new
+                        {
+                            Thang = g.Key,
+                            TongTien = g.Sum(h => h.TongTien ?? 0)
                         })
-                        .OrderBy(x => x.Ngay)
                         .ToList();
 
-                    chart1.Series["Tổng Tiền"].Points.Clear();
-                    foreach (var item in doanhThuTheoThang)
+                    // Tính tổng doanh thu
+                    decimal tongDoanhThu = hoaDonTheoThang.Sum(h => h.TongTien);
+                    lblDoanhThu.Text = $"{tongDoanhThu:N0} VNĐ";
+
+                    // Cấu hình biểu đồ
+                    chart1.ChartAreas[0].AxisY.LabelStyle.Format = "N0";
+                    chart1.ChartAreas[0].AxisY.Title = "Doanh Thu (VNĐ)";
+                    chart1.ChartAreas[0].AxisX.Title = "Tháng";
+                    chart1.ChartAreas[0].AxisX.Interval = 1;
+
+                    // Thêm dữ liệu vào biểu đồ
+                    foreach (var data in hoaDonTheoThang)
                     {
-                        chart1.Series["Tổng Tiền"].Points.AddXY(item.Ngay, item.TongTien);
+                        var point = chart1.Series[0].Points.Add((double)data.TongTien);
+                        point.AxisLabel = $"Tháng {data.Thang}";
+                        point.Label = $"{data.TongTien:N0}";
                     }
 
-                    // Cập nhật tiêu đề biểu đồ
+                    // Cập nhật tiêu đề
                     chart1.Titles.Clear();
-                    chart1.Titles.Add("DOANH THU TỪ NĂM 2025");
+                    chart1.Titles.Add("DOANH THU THEO THÁNG TỪ NĂM 2025");
+                    chart1.Titles[0].Font = new Font("Palatino Linotype", 16, FontStyle.Bold);
+                    chart1.Titles[0].Alignment = ContentAlignment.TopCenter;
+
+                    // Hiển thị chú thích
+                    chart1.Legends[0].Enabled = true;
+                    chart1.Legends[0].Docking = Docking.Top;
+                    chart1.Legends[0].Alignment = StringAlignment.Far;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải dữ liệu thống kê: " + ex.Message, 
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Lỗi: {ex.Message}", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

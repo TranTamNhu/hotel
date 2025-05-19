@@ -51,29 +51,31 @@
             this.label1.Size = new System.Drawing.Size(582, 63);
             this.label1.TabIndex = 0;
             this.label1.Text = "THỐNG KÊ DOANH THU";
-            this.label1.Click += new System.EventHandler(this.Label1_Click);
             // 
             // chart1
             // 
-            this.chart1.BackColor = System.Drawing.Color.IndianRed;
-            this.chart1.BorderlineColor = System.Drawing.Color.Black;
-            chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Transparent;
             chartArea1.Name = "ChartArea1";
+            chartArea1.BackColor = System.Drawing.Color.White;
+            chartArea1.BorderColor = System.Drawing.Color.LightGray;
+            chartArea1.BorderWidth = 1;
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
+            legend1.Enabled = false;
             this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(16, 200);
-            this.chart1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chart1.Margin = new System.Windows.Forms.Padding(4);
             this.chart1.Name = "chart1";
-            this.chart1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Pastel;
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Tổng Tiền";
-            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(1035, 450);
             this.chart1.TabIndex = 1;
             this.chart1.Text = "Thống kê doanh thu";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
+            series1.Color = System.Drawing.Color.FromArgb(((int)(((byte)(135)))), ((int)(((byte)(206)))), ((int)(((byte)(235)))));
+            series1.Legend = "Legend1";
+            series1.Name = "Tổng Tiền";
+            series1.BorderWidth = 2;
+            series1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(149)))), ((int)(((byte)(237)))));
+            this.chart1.Series.Add(series1);
             // 
             // btnTroVeCuaThongKe
             // 
@@ -81,7 +83,7 @@
             this.btnTroVeCuaThongKe.Image = global::PhanMemQuanLyKhachSan.Properties.Resources.iconBack;
             this.btnTroVeCuaThongKe.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnTroVeCuaThongKe.Location = new System.Drawing.Point(16, 14);
-            this.btnTroVeCuaThongKe.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnTroVeCuaThongKe.Margin = new System.Windows.Forms.Padding(4);
             this.btnTroVeCuaThongKe.Name = "btnTroVeCuaThongKe";
             this.btnTroVeCuaThongKe.Size = new System.Drawing.Size(135, 46);
             this.btnTroVeCuaThongKe.TabIndex = 10;
@@ -142,7 +144,7 @@
             this.Controls.Add(this.btnTroVeCuaThongKe);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmThongKe";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Thống Kê";
@@ -150,7 +152,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

@@ -155,9 +155,11 @@
             // 
             // id
             // 
-            this.id.HeaderText = "id";
+            this.id.HeaderText = "ID Dịch vụ";
             this.id.MinimumWidth = 8;
             this.id.Name = "id";
+            this.id.Visible = false;
+            this.id.ReadOnly = true;
             // 
             // txtSoLuong
             // 

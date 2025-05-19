@@ -58,23 +58,23 @@ namespace PhanMemQuanLyKhachSan
             }
         }
 
-        private void FillCaCombobox(List<LichLamViec> listLLV)
+        private void FillCaCombobox(List<LichLamViec> listLLV)        //nạp dữ liệu vào cbb
         {
             this.cbxCa.DataSource = listLLV;
             this.cbxCa.DisplayMember = "Ca";
             this.cbxCa.ValueMember = "LichLamViecID";
         }
 
-        private void FillTenNhanVienCombobox(List<NhanVien> listTenNV)
+        private void FillTenNhanVienCombobox(List<NhanVien> listTenNV)     // nạp dữ liệu vào cbb
         {
             this.cbxTenNV.DataSource = listTenNV;
             this.cbxTenNV.DisplayMember = "TenNV";
             this.cbxTenNV.ValueMember = "NhanVienID";
         }
 
-        private LichLamViec GetLichLamViecFromForm()
+        private LichLamViec GetLichLamViecFromForm() //lấy dữ liệu người dùng
         {
-            LichLamViec k = new LichLamViec();
+            LichLamViec k = new LichLamViec();                //khởi tạo đối tượng
             // Lấy NhanVienID từ giá trị được chọn trong combobox
             k.NhanVienID = (int)cbxTenNV.SelectedValue;
             k.Ca = cbxCa.Text;
@@ -84,7 +84,7 @@ namespace PhanMemQuanLyKhachSan
 
         private void LblLichLamViec_Click(object sender, EventArgs e)
         {
-            // Không có xử lý gì trong sự kiện này
+            
         }
 
         private void BtnTroVeCuaCapNhatLichLamViec_Click(object sender, EventArgs e)
@@ -102,7 +102,7 @@ namespace PhanMemQuanLyKhachSan
                 // Sử dụng controller để lấy dữ liệu
                 FillTenNhanVienCombobox(controller.GetAllNhanVien());
                 FillCaCombobox(controller.GetAllLichLamViec());
-                BindGrid(controller.GetAllLichLamViec());
+                BindGrid(controller.GetAllLichLamViec());              // hiển thị toàn bộ llv
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                // Lấy thông tin từ form
+                // Lấy thông tin từ form                              
                 LichLamViec lichLamViec = GetLichLamViecFromForm();
 
                 // Sử dụng controller để thêm lịch làm việc
@@ -122,7 +122,7 @@ namespace PhanMemQuanLyKhachSan
                 {
                     MessageBox.Show("Thêm Lịch Làm Việc thành công!");
                     // Cập nhật lại grid
-                    BindGrid(controller.GetAllLichLamViec());
+                    BindGrid(controller.GetAllLichLamViec());                  // hiển thị lên
                 }
             }
             catch (Exception ex)
@@ -135,7 +135,7 @@ namespace PhanMemQuanLyKhachSan
         {
             try
             {
-                int rowIndex = (int)dgvCapNhatLichLamViec.CurrentRow.Cells[4].Value;
+                int rowIndex = (int)dgvCapNhatLichLamViec.CurrentRow.Cells[4].Value;      //lấy id dòng được chọn
 
                 // Sử dụng controller để xóa lịch làm việc
                 if (controller.DeleteLichLamViec(rowIndex))
@@ -156,7 +156,7 @@ namespace PhanMemQuanLyKhachSan
             {
                 // Lấy thông tin từ form
                 LichLamViec lichLamViec = GetLichLamViecFromForm();
-                lichLamViec.LichLamViecID = (int)dgvCapNhatLichLamViec.CurrentRow.Cells[4].Value;
+                lichLamViec.LichLamViecID = (int)dgvCapNhatLichLamViec.CurrentRow.Cells[4].Value;        //lấy id của dòng đang chọn
 
                 // Sử dụng controller để cập nhật lịch làm việc
                 if (controller.InsertUpdateLichLamViec(lichLamViec))
